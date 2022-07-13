@@ -506,6 +506,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#administrative-tasks_gsg">6. Administrative tasks</a>
 <ul class="sectlevel2">
 <li><a href="#starting-monitoring_gsg">6.1. Starting monitoring</a></li>
+<li><a href="#enabling-override-operators_gsg">6.2. Enabling override Operators</a></li>
 </ul>
 </li>
 <li><a href="#troubleshooting_gsg">7. Troubleshooting CRC</a>
@@ -2264,6 +2265,62 @@ To remove monitoring, set the <code>enable-cluster-monitoring</code> configurabl
 </td>
 </tr>
 </table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enabling-override-operators_gsg"><a class="anchor" href="#enabling-override-operators_gsg"></a><a class="link" href="#enabling-override-operators_gsg">6.2. Enabling override Operators</a></h3>
+<div class="paragraph">
+<p>To make sure CRC can run on a typical laptop, some resource-heavy services get disabled by default.
+These services can be enabled by manually removing the desired Operator from the Operator override list.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>A running CRC virtual machine and a working <code class="command">oc</code> command.
+For more information, see <a href="https://code-ready.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with <code>oc</code></a>.</p>
+</li>
+<li>
+<p>You must log in through <code class="command">oc</code> as the <code>kubeadmin</code> user.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>List unmanaged Operators and note the numeric index for the desired Operator:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>On Linux or macOS:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc get clusterversion version -ojsonpath='{range .spec.overrides[*]}{.name}{"\n"}{end}' | nl -v 0</pre>
+</div>
+</div>
+</li>
+<li>
+<p>On Microsoft Windows using PowerShell:</p>
+<div class="listingblock">
+<div class="content">
+<pre>PS&gt; oc get clusterversion version -ojsonpath='{range .spec.overrides[*]}{.name}{"\n"}{end}' | % {$nl++;"`t$($nl-1) `t $_"};$nl=0</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Start the desired Operator using the identified numeric index:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc patch clusterversion/version --type='json' -p '[{"op":"remove", "path":"/spec/overrides/<em>&lt;unmanaged-operator-index&gt;</em>"}]'
+clusterversion.config.openshift.io/version patched</pre>
+</div>
 </div>
 </li>
 </ol>
